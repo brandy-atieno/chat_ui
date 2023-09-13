@@ -29,7 +29,7 @@ List <Message> chats=[
     read:true
   ),
   Message(
-    sender:brandy,
+    sender:currentUser,
     time:'2:00pm',
     text:'Still up for brunch?',
     read:false
@@ -51,7 +51,7 @@ List <Message> chats=[
 
 List <Message> chatMessages=[
   Message(
-    sender:brandy,
+    sender:currentUser,
     time:'2:10pm',
     text:'am so hungry yes?',
     read:true
@@ -69,7 +69,7 @@ List <Message> chatMessages=[
     read:true
   ),
   Message(
-    sender:brandy,
+    sender:currentUser,
     time:'5:10pm',
     text:'Am actually running late do you mind picking it instead',
     read:false
@@ -80,7 +80,7 @@ List <Message> chatMessages=[
     read:false
   ),
   Message(
-    sender:brandy,
+    sender:currentUser,
     time:'5:17pm',
     text:'Oh my thank you sooo much,Love you.',
     read:true

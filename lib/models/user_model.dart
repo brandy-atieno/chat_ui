@@ -12,7 +12,7 @@ class User {
       required this.isOnline});
 }
 
-final User brandy = User(
+final User currentUser = User(
     id: 0,
     name: 'Brandy',
     imageUrl: 'assets/images/IMG_20170828_084259.jpg',
