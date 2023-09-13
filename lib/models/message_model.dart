@@ -80,7 +80,7 @@ List <Message> chatMessages=[
     read:false
   ),
   Message(
-    sender:currentUser,
+    sender:joel,
     time:'5:17pm',
     text:'Oh my thank you sooo much,Love you.',
     read:true
