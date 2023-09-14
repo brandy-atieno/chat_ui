@@ -12,55 +12,8 @@ class Chat_Screen extends StatefulWidget {
 }
 
 class _Chat_ScreenState extends State<Chat_Screen> {
-  _chatBubble(Message message, bool isMe) {
+  _chatBubble(Message message, bool isMe, bool isSameUser) {
     if (isMe) {
-      return Column(
-        children: [
-          Container(
-            alignment: Alignment.topRight,
-            child: Container(
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 0.80,
-                ),
-                padding: EdgeInsets.all(10),
-                margin: EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                    color: Color.fromARGB(211, 1, 176, 189),
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 2,
-                        blurRadius: 5,
-                      )
-                    ]),
-                child: Text(
-                    message.text,
-                    style: TextStyle(color: Colors.white))),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              Text(message.time,
-                  style: TextStyle(fontSize: 12, color: Colors.black54)),
-              SizedBox(width: 10),
-              Container(
-                  decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                    )
-                  ]),
-                  child: CircleAvatar(
-                      radius: 20,
-                      backgroundImage:
-                          AssetImage(message.sender.imageUrl))),
-            ],
-          ),
-        ],
-      );
-    } else {
       return Column(
         children: [
           Container(
@@ -81,10 +34,10 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                         blurRadius: 5,
                       )
                     ]),
-                child: Text(
-                    message.text,
+                child: Text(message.text,
                     style: TextStyle(color: Colors.black54))),
           ),
+          !isSameUser ?
           Row(
             children: [
               Container(
@@ -97,20 +50,103 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                   ]),
                   child: CircleAvatar(
                       radius: 20,
-                      backgroundImage:
-                          AssetImage(message.sender.imageUrl))),
+                      backgroundImage: AssetImage(message.sender.imageUrl))),
               SizedBox(width: 10),
               Text(message.time,
                   style: TextStyle(fontSize: 12, color: Colors.black54))
             ],
+          ):
+                    Container(child:null),
+        ],
+      );
+      
+    } else {
+      return Column(
+        children: [
+          Container(
+            alignment: Alignment.topRight,
+            child: Container(
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * 0.80,
+                ),
+                padding: EdgeInsets.all(10),
+                margin: EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                    color: Color.fromARGB(211, 1, 176, 189),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                      )
+                    ]),
+                child:
+                    Text(message.text, style: TextStyle(color: Colors.white))),
           ),
+          !isSameUser ?
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              Text(message.time,
+                  style: TextStyle(fontSize: 12, color: Colors.black54)),
+              SizedBox(width: 10),
+              Container(
+                  decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                    )
+                  ]),
+                  child: CircleAvatar(
+                      radius: 20,
+                      backgroundImage: AssetImage(message.sender.imageUrl))),
+            ],
+          ):
+          Container(child:null),
+
         ],
       );
     }
   }
+  _sendMessage(){
+              Container(
+                padding:EdgeInsets.symmetric(horizontal: 8),
+                height:70,
+                color:Colors.white,
+
+                child: Row(
+                  children:  [
+                    IconButton(
+                      icon: Icon(Icons.photo),
+                      iconSize: 25,
+                      color: Theme.of(context).primaryColor,
+                      onPressed:(){}
+                    ),
+                    Expanded(
+                      child:TextField(
+                        decoration: InputDecoration.collapsed(
+                          hintText: 'Send a message ..'
+                        ),
+                        textCapitalization:TextCapitalization.sentences,
+                      ),
+                    ),
+                      IconButton(
+                      icon: Icon(Icons.send),
+                      iconSize: 25,
+                      color: Theme.of(context).primaryColor,
+                      onPressed:(){}
+                    ),
+                  ],
+                ));
+
+
+  }
 
   @override
   Widget build(BuildContext context) {
+    int prevUserId;
     return Scaffold(
         backgroundColor: Color.fromARGB(255, 228, 220, 220),
         appBar: AppBar(
@@ -130,12 +166,20 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                       fontWeight: FontWeight.w400,
                     )),
                 TextSpan(text: '\n'),
+                widget.user.isOnline ?
                 TextSpan(
                     text: 'Online',
                     style:
-                        TextStyle(fontSize: 12, fontWeight: FontWeight.w300)),
+                        TextStyle(fontSize: 12, fontWeight: FontWeight.w300)):
+                         TextSpan(
+                    text: 'Offline',
+                    style:
+                        TextStyle(fontSize: 12, fontWeight: FontWeight.w300))
+
               ],
             ),
+            
+            
           ),
           leading: IconButton(
               color: Colors.white,
@@ -146,16 +190,22 @@ class _Chat_ScreenState extends State<Chat_Screen> {
         ),
         body: Column(children: <Widget>[
           Expanded(
-                         child: ListView.builder(
-                            itemCount: chatMessages.length,
+              child: ListView.builder(
+            itemCount: chatMessages.length,
             itemBuilder: (BuildContext context, int index) {
               final Message message = chatMessages[index];
               final bool isMe = message.sender.id == currentUser.id;
-              return _chatBubble(message, isMe);
+                            prevUserId = message.sender.id;
+
+              final bool isSameUser = prevUserId == message.sender.id;
+              return _chatBubble(message, isMe,isSameUser);
             },
-                padding:EdgeInsets.all(20),
-          )),
-          Container(child: Text('Send Text')),
-        ]));
+            padding: EdgeInsets.all(20),
+          ) 
+          ),
+       _sendMessage()
+        ]
+        )
+        );
   }
 }
